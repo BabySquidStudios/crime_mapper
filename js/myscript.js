@@ -6,7 +6,7 @@ function style(feature) {
         fillOpacity: 0.4,
         weight: 2,
         opacity: 1,
-        color: 'white',
+        color: 'white',  
         dashArray: '3'
     };
 }
@@ -71,7 +71,6 @@ function handleCommand() {
 }
 
 document.getElementById('assault').addEventListener("click", handleCommand, false);
-
 
 
 
