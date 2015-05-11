@@ -50,6 +50,15 @@ geojson = L.geoJson(lga, {
 }).addTo(map);
 
 
+file = "http://127.0.0.1:62741/res/Adelaide.csv";
+
+Papa.parse(file, {
+    download: true,
+    complete: function (results){
+        console.log(results.data[2]);
+    }
+});
+
 //Controls
 var info = L.control();
 
@@ -66,11 +75,6 @@ info.onAdd = function (map) {
 
 info.addTo(map);
 
-function handleCommand() {
-    alert("Clicked ");
-}
-
-document.getElementById('assault').addEventListener("click", handleCommand, false);
 
 
 
