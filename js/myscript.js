@@ -26,12 +26,56 @@ var files = [
 "res/Walkerville.csv",
 "res/West Torrens.csv"];
 
-//[LGA][OFFENCE TYPE][YEAR]
+var offenceTypes = [
+    'All offences against the person, excl sexual',
+    'All sexual offences',
+    'All robbery and extortion offences',
+    'All offences against property',
+    'All offences against good order',
+    'All drug offences',
+    'All driving offences',
+    'Total offences'
+];
 
+var info = L.control();
+
+info.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+    this.update();
+    return this._div;
+};
+
+var selected = 1;
+
+// method that we will use to update the control based on feature properties passed
+info.update = function (props) {
+    this._div.innerHTML =
+        '<h3> Select Offence Type </h3>' +
+        '<select id = "offence" onChange = "setSelection()">' +
+        '<option value="1">' + offenceTypes[0] + '</option>' +
+        '<option value="6">' + offenceTypes[1] + '</option>' +
+        '<option value="11">' + offenceTypes[2] + '</option>' +
+        '<option value="15">' + offenceTypes[3] + '</option>' +
+        '<option value="25">' + offenceTypes[4] + '</option>' +
+        '<option value="26">' + offenceTypes[5] + '</option>' +
+        '<option value="32">' + offenceTypes[6] + '</option>' +
+        '<option value="40">' + offenceTypes[7] + '</option>' +
+        '< /select>';
+};
+
+info.addTo(map);
+
+//[LGA][OFFENCE TYPE][YEAR]
 var lgaData = [];
 var count = 0;
 var geojson;
 
+function setSelection() {
+    var e = document.getElementById("offence");
+    selected = e.value;
+    map.removeLayer(geojson);
+    addLGAs(lgaData)
+}
 
 for (var i = 0; i < files.length; i++) {
     Papa.parse(files[i], {
@@ -40,8 +84,8 @@ for (var i = 0; i < files.length; i++) {
             lgaData.push(results.data);
             count++;
             if (count == files.length) {
-                console.log(lgaData);
                 addLGAs(lgaData);
+                console.log(lgaData);
             }
         }
     });
@@ -49,25 +93,37 @@ for (var i = 0; i < files.length; i++) {
 
 function addLGAs(data) {
     lgaData = data;
+    values = [];
+
+    for (var i = 0; i < files.length; i++) {
+        values.push(lgaData[i][selected][5]);
+    }
+
+    var max = Math.max.apply(null, values);
+    var min = Math.min.apply(null, values);
 
     function getColor(name) {
         for (var i = 0; i < files.length; i++) {
             if (lgaData[i][0][0] == name) {
-                return nameToColor(lgaData[i][1][5]);
+                return nameToColor(lgaData[i][selected][5]);
             }
         }
     }
 
     function nameToColor(d) {
-        return d > 60 ? '#990000' :
-            d > 20 ? '#d7301f' :
-            d > 13 ? '#ef6548' :
-            d > 10 ? '#fc8d59' :
-            d > 7 ? '#fdbb84' :
-            d > 5 ? '#fdd49e' :
-            d > 3 ? '#fee8c8' :
-            '#fff7ec';
+        return d >= max ? '#5a040f' :
+            d > min + max / 2 - 1 ? '#67000d' :
+            d > min + max / 3 - 1 ? '#a50f15' :
+            d > min + max / 4 - 1 ? '#cb181d' :
+            d > min + max / 5 - 1 ? '#ef3b2c' :
+            d > min + max / 6 - 1 ? '#fb6a4a' :
+            d > min + max / 7 - 1 ? '#fc9272' :
+            d > min + max / 8 - 1 ? '#fcbba1' :
+            d > min + max / 9 - 1 ? '#fee0d2' :
+            d <= min  ? '#fff5f0' :
+            '#ffffff';
     }
+
 
     function style(feature) {
         return {
@@ -112,5 +168,3 @@ function addLGAs(data) {
     }).addTo(map);
 
 }
-
-
