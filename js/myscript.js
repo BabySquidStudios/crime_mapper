@@ -65,6 +65,52 @@ info.update = function (props) {
 
 info.addTo(map);
 
+var lgaInfo = L.control({
+    position: 'topleft'
+});
+
+lgaInfo.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'lgainfo');
+    this.update();
+    return this._div;
+};
+
+lgaInfo.update = function (props, rate) {
+    this._div.innerHTML = '<p> <b>' + props + '</b> </p>' +
+        '<p> Offences per 1000 people: <b>' + rate + '</b></p>';
+};
+
+lgaInfo.addTo(map);
+
+var legend = L.control({
+    position: 'bottomleft'
+});
+
+legend.onAdd = function (map) {
+    this._div = L.DomUtil.create('div', 'legend');
+    this.update();
+    return this._div;
+};
+
+legend.update = function (props, min, max) {
+    if (props != undefined) {
+        this._div.innerHTML =
+            '<p> Rate per 1000 people </p>' +
+            '<ul>' +
+            '<li style = "background:#99000d">' + 0 + " - " + min.toPrecision(3) + '</li>' +
+            '<li>' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '</li>' +
+            '<li>' + props[1].toPrecision(3) + " - " + props[2].toPrecision(3) + '</li>' +
+            '<li>' + props[2].toPrecision(3) + " - " + props[3].toPrecision(3) + '</li>' +
+            '<li>' + props[3].toPrecision(3) + " - " + props[4].toPrecision(3) + '</li>' +
+            '<li>' + props[4].toPrecision(3) + " - " + props[5].toPrecision(3) + '</li>' +
+            '<li>' + " > " + max.toFixed(1) + '</li>' +
+            '</ul>';
+    }
+};
+
+legend.addTo(map);
+
+
 //[LGA][OFFENCE TYPE][YEAR]
 var lgaData = [];
 var count = 0;
@@ -102,6 +148,22 @@ function addLGAs(data) {
     var max = Math.max.apply(null, values);
     var min = Math.min.apply(null, values);
 
+    var sorted = values.sort(function (a, b) {
+        return a - b
+    });
+
+    sorted.splice(sorted.length - 1, 1)
+
+    var sMax = Math.max.apply(null, sorted);
+
+    console.log(sorted);
+
+    var scale = chroma.scale(['#ffffd9', '#0c2c84']).domain([min + 0.001, sMax], 5);
+
+    legend.update(scale.domain(), min, max)
+
+    console.log(scale.domain());
+
     function getColor(name) {
         for (var i = 0; i < files.length; i++) {
             if (lgaData[i][0][0] == name) {
@@ -110,18 +172,22 @@ function addLGAs(data) {
         }
     }
 
+    function getRate(name) {
+        for (var i = 0; i < files.length; i++) {
+            if (lgaData[i][0][0] == name) {
+                return lgaData[i][selected][5];
+            }
+        }
+    }
+
     function nameToColor(d) {
-        return d >= max ? '#5a040f' :
-            d > min + max / 2 - 1 ? '#67000d' :
-            d > min + max / 3 - 1 ? '#a50f15' :
-            d > min + max / 4 - 1 ? '#cb181d' :
-            d > min + max / 5 - 1 ? '#ef3b2c' :
-            d > min + max / 6 - 1 ? '#fb6a4a' :
-            d > min + max / 7 - 1 ? '#fc9272' :
-            d > min + max / 8 - 1 ? '#fcbba1' :
-            d > min + max / 9 - 1 ? '#fee0d2' :
-            d <= min  ? '#fff5f0' :
-            '#ffffff';
+        return d >= max ? '#99000d' :
+            d > scale.domain()[5] ? '#cb181d' :
+            d > scale.domain()[4] ? '#ef3b2c' :
+            d > scale.domain()[3] ? '#fb6a4a' :
+            d > scale.domain()[2] ? '#fc9272' :
+            d > scale.domain()[1] ? '#fcbba1' :
+            '#ffefd9';
     }
 
 
@@ -137,6 +203,9 @@ function addLGAs(data) {
     }
 
     function highlightFeature(e) {
+        lgaInfo.update(e.target.feature.properties.ABBNAME,
+            getRate(e.target.feature.properties.ABBNAME));
+
         var layer = e.target;
 
         layer.setStyle({
