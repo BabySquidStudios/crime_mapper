@@ -1,4 +1,4 @@
-var map = L.map('map').setView([-34.92866, 138.59863], 10);
+var map = L.map('map', {zoomControl: false}).setView([-34.92866, 138.59863], 10);
 
 L.tileLayer('https://{s}.tiles.mapbox.com/v3/{id}/{z}/{x}/{y}.png', {
     maxZoom: 14,
@@ -95,16 +95,6 @@ legend.onAdd = function (map) {
 legend.update = function (props, min, max) {
     if (props != undefined) {
         this._div.innerHTML =
-            //            '<p> Rate per 1000 people </p>' +
-            //            '<ul>' +
-            //            '<li>' + 0 + " - " + min.toPrecision(3) + '</li>' +
-            //            '<li>' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '</li>' +
-            //            '<li>' + props[1].toPrecision(3) + " - " + props[2].toPrecision(3) + '</li>' +
-            //            '<li>' + props[2].toPrecision(3) + " - " + props[3].toPrecision(3) + '</li>' +
-            //            '<li>' + props[3].toPrecision(3) + " - " + props[4].toPrecision(3) + '</li>' +
-            //            '<li>' + props[4].toPrecision(3) + " - " + props[5].toPrecision(3) + '</li>' +
-            //            '<li>' + " > " + max.toFixed(1) + '</li>' +
-            //            '</ul>';
             '<p id="legend_title">  Rate per 1000 people </p>' +
             '<i style="background:' + color[0] + '"></i> ' + 0 + " - " + min.toPrecision(3) + '<br>' +
             '<i style="background:' + color[1] + '"></i> ' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '<br>' +
