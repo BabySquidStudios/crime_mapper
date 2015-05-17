@@ -95,21 +95,28 @@ legend.onAdd = function (map) {
 legend.update = function (props, min, max) {
     if (props != undefined) {
         this._div.innerHTML =
-            '<p> Rate per 1000 people </p>' +
-            '<ul>' +
-            '<li style = "background:#99000d">' + 0 + " - " + min.toPrecision(3) + '</li>' +
-            '<li>' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '</li>' +
-            '<li>' + props[1].toPrecision(3) + " - " + props[2].toPrecision(3) + '</li>' +
-            '<li>' + props[2].toPrecision(3) + " - " + props[3].toPrecision(3) + '</li>' +
-            '<li>' + props[3].toPrecision(3) + " - " + props[4].toPrecision(3) + '</li>' +
-            '<li>' + props[4].toPrecision(3) + " - " + props[5].toPrecision(3) + '</li>' +
-            '<li>' + " > " + max.toFixed(1) + '</li>' +
-            '</ul>';
+            //            '<p> Rate per 1000 people </p>' +
+            //            '<ul>' +
+            //            '<li>' + 0 + " - " + min.toPrecision(3) + '</li>' +
+            //            '<li>' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '</li>' +
+            //            '<li>' + props[1].toPrecision(3) + " - " + props[2].toPrecision(3) + '</li>' +
+            //            '<li>' + props[2].toPrecision(3) + " - " + props[3].toPrecision(3) + '</li>' +
+            //            '<li>' + props[3].toPrecision(3) + " - " + props[4].toPrecision(3) + '</li>' +
+            //            '<li>' + props[4].toPrecision(3) + " - " + props[5].toPrecision(3) + '</li>' +
+            //            '<li>' + " > " + max.toFixed(1) + '</li>' +
+            //            '</ul>';
+            '<p id="legend_title">  Rate per 1000 people </p>' +
+            '<i style="background:' + color[0] + '"></i> ' + 0 + " - " + min.toPrecision(3) + '<br>' +
+            '<i style="background:' + color[1] + '"></i> ' + min.toPrecision(3) + " - " + props[1].toPrecision(3) + '<br>' +
+            '<i style="background:' + color[2] + '"></i> ' + props[1].toPrecision(3) + " - " + props[2].toPrecision(3) + '<br>' +
+            '<i style="background:' + color[3] + '"></i> ' + props[2].toPrecision(3) + " - " + props[3].toPrecision(3) + '<br>' +
+            '<i style="background:' + color[4] + '"></i> ' + props[3].toPrecision(3) + " - " + props[4].toPrecision(3) + '<br>' +
+            '<i style="background:' + color[5] + '"></i> ' + props[4].toPrecision(3) + " - " + props[5].toPrecision(3) + '<br>' +
+            '<i style="background:' + color[6] + '"></i> ' + " > " + Math.floor(max) + '<br>';
     }
 };
 
 legend.addTo(map);
-
 
 //[LGA][OFFENCE TYPE][YEAR]
 var lgaData = [];
@@ -136,6 +143,10 @@ for (var i = 0; i < files.length; i++) {
         }
     });
 }
+
+var color = ['#fffbf0', '#f4d5c3', '#fcbba1', '#fc9272', '#fb6a4a', '#ef3b2c', '#cb181d', '#b20909'];
+
+
 
 function addLGAs(data) {
     lgaData = data;
@@ -181,20 +192,21 @@ function addLGAs(data) {
     }
 
     function nameToColor(d) {
-        return d >= max ? '#99000d' :
-            d > scale.domain()[5] ? '#cb181d' :
-            d > scale.domain()[4] ? '#ef3b2c' :
-            d > scale.domain()[3] ? '#fb6a4a' :
-            d > scale.domain()[2] ? '#fc9272' :
-            d > scale.domain()[1] ? '#fcbba1' :
-            '#ffefd9';
+        return d >= max ? color[7] :
+            d > scale.domain()[5] ? color[6] :
+            d > scale.domain()[4] ? color[5] :
+            d > scale.domain()[3] ? color[4] :
+            d > scale.domain()[2] ? color[3] :
+            d > scale.domain()[1] ? color[2] :
+            d > scale.domain()[0] ? color[1] :
+            color[0];
     }
 
 
     function style(feature) {
         return {
             fillColor: getColor(feature.properties.ABBNAME),
-            fillOpacity: 0.7,
+            fillOpacity: 0.8,
             weight: 2,
             opacity: 1,
             color: 'white',
@@ -212,7 +224,7 @@ function addLGAs(data) {
             weight: 4,
             color: '#666',
             dashArray: '',
-            fillOpacity: 0.8
+            fillOpacity: 0.9
         });
 
         if (!L.Browser.ie && !L.Browser.opera) {
